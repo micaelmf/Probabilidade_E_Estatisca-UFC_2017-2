@@ -9,7 +9,7 @@ public class Principal {
 		Problema01 p = new Problema01(3,45); //(quantidade de cargos, quantidade de funcionários)
 		
 		//p.rand(1, 70, 44);
-		
+
 		//System.out.println("\n----------- DISTANCIAS -----------");
 		p.carregaDistancias();
 		//p.imprimiDistancias();
@@ -27,8 +27,7 @@ public class Principal {
 		p.setMaxSecretarios(5);
 		
 		p.primeiroGrupo();
-		
-		
+		p.procuraMelhorGrupo(100);
 	}
 
 }
