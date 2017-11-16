@@ -19,14 +19,17 @@ public class Problema01 {
 	private int maxMedicos = 0; //quantidade mínima que um grupo deve ter de médicos
 	private int maxEnfermeiros = 0; //quantidade mínima que um grupo deve ter de enfermeiros
 	private int maxSecretarios = 0; //quantidade mínima que um grupo deve ter de sercretários
-	private int distancias[][] = null;
-	private int cargos[][] = null;
-	private int melhorSoma = 0;
-	private ArrayList<Integer> melhorGrupo = new ArrayList<Integer>();
-	private ArrayList<Integer> grupo = new ArrayList<Integer>();
-	private ArrayList<Integer> medicos = new ArrayList<Integer>();
+	private int distancias[][] = null; //matriz que armazena a distância entre os funcionários
+	private int cargos[][] = null; //matriz que armazena os cargos dos funcionário
+	private int melhorSoma = 100000; //armazena a melhor soma
+	private ArrayList<Integer> melhorGrupo = new ArrayList<Integer>(); // armazena a melhor grupo
+	private ArrayList<Integer> grupo = new ArrayList<Integer>(); //sem uso
+	private ArrayList<Integer> medicos = new ArrayList<Integer>(); //array com todos os médicos
 	private ArrayList<Integer> enfermeiros = new ArrayList<Integer>();
 	private ArrayList<Integer> secretarios = new ArrayList<Integer>();
+	private ArrayList<Integer> melhorCombMedicos = new ArrayList<Integer>(); // armazena a melhor combinação de médicos
+	private ArrayList<Integer> melhorCombEnfermeiros = new ArrayList<Integer>();
+	private ArrayList<Integer> melhorCombSecretarios = new ArrayList<Integer>();
 	
 	
 	Problema01(int qntCargos, int qntFunc){
@@ -98,22 +101,80 @@ public class Problema01 {
 		int metade = tentativas/2;
 		int cont = 1;
 		ArrayList<Integer> grupoTemp = new ArrayList<Integer>();
-		
+		//System.out.println("---------------------------------------------INÍCIO");
 		while(cont <= metade){
-			grupoTemp.addAll(vetorAleatorioFuncionarios(getMaxMedicos(), getMedicos()));
-			grupoTemp.addAll(vetorAleatorioFuncionarios(getMaxEnfermeiros(), getEnfermeiros()));
-			grupoTemp.addAll(vetorAleatorioFuncionarios(getMaxSecretarios(), getSecretarios()));
+			ArrayList<Integer> med = new ArrayList<Integer>();
+			ArrayList<Integer> enf = new ArrayList<Integer>();
+			ArrayList<Integer> sec = new ArrayList<Integer>();
+			med = vetorAleatorioFuncionarios(getMaxMedicos(), getMedicos()); //armazena a combinação de médicos
+			enf = vetorAleatorioFuncionarios(getMaxEnfermeiros(), getEnfermeiros());
+			sec = vetorAleatorioFuncionarios(getMaxSecretarios(), getSecretarios());
+			//junta os vetores acima
+			grupoTemp.addAll(med);
+			grupoTemp.addAll(enf);
+			grupoTemp.addAll(sec);
 			
 			//imprimiGrupo(grupoTemp);
 			ArrayList<Integer> distancias = atribuiDistancias(grupoTemp);
 			int soma = somaGrupo(distancias); 
 			if(soma < getMelhorSoma()){
 				setMelhorSoma(soma);
-				setMelhorGrupo(distancias);
+				setMelhorGrupo(grupoTemp);
+				setMelhorCombMedicos(med);
+				setMelhorCombEnfermeiros(enf);
+				setMelhorCombSecretarios(sec);
+			}
+			cont++;
+			//imprimiGrupo(grupoTemp);
+			grupoTemp = new ArrayList<Integer>();
+		}
+		
+		while(cont <= tentativas){
+			grupoTemp.addAll(getMelhorCombMedicos());
+			grupoTemp.addAll(trocaMetadeFunc(getMelhorCombEnfermeiros(),getEnfermeiros()));
+			grupoTemp.addAll(getMelhorCombSecretarios());
+
+			ArrayList<Integer> distancias = atribuiDistancias(grupoTemp);
+			int soma = somaGrupo(distancias);
+			if(soma < getMelhorSoma()){
+				setMelhorSoma(soma);
+				//setMelhorGrupo(grupoTemp);
 			}
 			cont++;
 			grupoTemp = new ArrayList<Integer>();
 		}
+		
+		//System.out.println("---------------------------------------------FIM");
+	}
+	
+	public ArrayList<Integer> trocaMetadeFunc(ArrayList<Integer> resultado, ArrayList<Integer> funcionarios){
+		//ArrayList<Integer> resultado = new ArrayList<Integer>(); //armazenas os funcionários para retorno
+		Random r = new Random();
+		boolean adiciona = false;
+
+		int qntTrocas = resultado.size()/2;
+		//removendo a metade do vetor
+		for(int i = 0; i < qntTrocas; i++){
+			resultado.remove(resultado.size()-1);
+		}
+		int cont = 0;
+		while (cont < qntTrocas) {
+			int funcionario = (int) funcionarios.get(r.nextInt(funcionarios.size()));
+			for (int i = 0; i < resultado.size(); i++) {
+				
+				if(funcionario != resultado.get(i)){
+					adiciona = true;
+				}else{
+					adiciona = false;
+					break;
+				}
+			}
+			if(adiciona == true){
+				resultado.add(funcionario);
+				cont++;
+			}
+		}
+		return resultado;
 	}
 	
 	public ArrayList<Integer> vetorAleatorioFuncionarios(int maxCargo, ArrayList<Integer> cargo){
@@ -164,9 +225,11 @@ public class Problema01 {
 	}
 	
 	public ArrayList<Integer> atribuiDistancias(ArrayList<Integer> posicoes){
+		/*
 		System.out.println("------------------------------------------------------------------------------------");
 		System.out.printf("Grupo: \t\t");
 		imprimiGrupo(posicoes);
+		*/
 		ArrayList<Integer> grupoTemp = new ArrayList<Integer>();
 		//atribuindo as distancias entre os funcionários
 		for(int i = 0; i <= posicoes.size(); i++){
@@ -176,10 +239,11 @@ public class Problema01 {
 			}
 		}
 		grupoTemp.add(this.distancias[posicoes.get(0)][posicoes.get((calcTamGrupo())-1)]);
+		/*
 		System.out.printf("Grupo(dist): \t");
 		imprimiGrupo(grupoTemp);
 		System.out.println("------------------------------------------------------------------------------------");
-		
+		*/
 		return grupoTemp;
 	}
 	
@@ -190,23 +254,22 @@ public class Problema01 {
 			parcial = 0;
 			for (int j = i+1; j < grupo.size(); j++) {
 				parcial = parcial + (grupo.get(i) + grupo.get(j));				
-				System.out.printf("(" + grupo.get(i) + " + " + grupo.get(j) + ")");
+				//System.out.printf("(" + grupo.get(i) + " + " + grupo.get(j) + ")");
 			}
 			soma = soma + parcial;
 			if(parcial != 0){
-				System.out.println(" Parcial: " + parcial);
+				//System.out.println(" Parcial: " + parcial);
 			}
 		}
-		
+		/*
 		if(soma > getMelhorSoma()){
-			//chamar o método que troca o grupo
-		}else{
-			
+			setMelhorSoma(soma);
 		}
+		
 		System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
 		System.out.println("RESULTADO: " + soma);
 		System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-		
+		*/
 		return soma;
 	}
 	
@@ -215,6 +278,17 @@ public class Problema01 {
 			System.out.printf(grupo.get(i) + "|");
 		}
 		System.out.println("");
+	}
+	
+	public void imprimiMelhorGrupo(){
+		ArrayList<Integer> melhor = new ArrayList<Integer>();
+		melhor = getMelhorGrupo();
+		//System.out.printf("Melhor Grupo: ");
+		for(int i = 0; i < melhor.size(); i++){
+			System.out.printf(melhor.get(i)+1 + "|");
+		}
+		System.out.println("");
+		//System.out.println("Soma:" + getMelhorSoma());
 	}
 	
 	public void carregaDistancias() throws IOException{
@@ -426,5 +500,30 @@ public class Problema01 {
 	public void setMelhorGrupo(ArrayList<Integer> melhorGrupo) {
 		this.melhorGrupo = melhorGrupo;
 	}
+
+	public ArrayList<Integer> getMelhorCombMedicos() {
+		return melhorCombMedicos;
+	}
+
+	public void setMelhorCombMedicos(ArrayList<Integer> melhorCombMedicos) {
+		this.melhorCombMedicos = melhorCombMedicos;
+	}
+
+	public ArrayList<Integer> getMelhorCombEnfermeiros() {
+		return melhorCombEnfermeiros;
+	}
+
+	public void setMelhorCombEnfermeiros(ArrayList<Integer> melhorCombEnfermeiros) {
+		this.melhorCombEnfermeiros = melhorCombEnfermeiros;
+	}
+
+	public ArrayList<Integer> getMelhorCombSecretarios() {
+		return melhorCombSecretarios;
+	}
+
+	public void setMelhorCombSecretarios(ArrayList<Integer> melhorCombSecretarios) {
+		this.melhorCombSecretarios = melhorCombSecretarios;
+	}
     
+	
 }

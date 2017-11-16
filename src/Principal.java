@@ -27,7 +27,10 @@ public class Principal {
 		p.setMaxSecretarios(5);
 		
 		p.primeiroGrupo();
-		p.procuraMelhorGrupo(100);
+		for(int i = 0; i < 10; i++){
+			p.procuraMelhorGrupo(100);
+			p.imprimiMelhorGrupo();
+		}
 	}
 
 }
