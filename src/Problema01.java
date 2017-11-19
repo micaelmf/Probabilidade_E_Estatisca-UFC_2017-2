@@ -98,8 +98,8 @@ public class Problema01 {
 		 * 		1.2 > Selecionar o funcionário, para troca, com base no número sorteado, ex.: Se o número sorteado foi 339
 		 * 			  deve-se selecionar um secretário para ser trocado.
 		 * 		1.3 > Selecionar um funcionário do mesmo tipo para substituir o funcionário selecionado antes 
-		 * 2) Somar as distâncias do novo vetor
-		 * 3) Guardar a melhor soma e o melhor vetor
+		 * 2) Somar as distâncias da nova lista
+		 * 3) Guardar a melhor soma e a melhor lista
 		 */
 		
 		Random r = new Random();		
@@ -108,7 +108,7 @@ public class Problema01 {
 		for (int i = 0; i < tentativas; i++) {
 			int num = r.nextInt(1000);
 			
-			if(num >= 1 && num <= 130 ){
+			if(num >= 0 && num <= 130 ){
 				//trocar médico
 				Random r2 = new Random();
 				ArrayList<Integer> melhorSubGrupo = getMelhorCombMedicos();
@@ -120,6 +120,8 @@ public class Problema01 {
 				
 				ArrayList<Integer> distancias = atribuiDistancias(grupoTemp);
 				int soma = somaGrupo(distancias);
+				imprimiGrupo(grupoTemp);
+				System.out.println("Soma: " + soma);
 				if(soma < getMelhorSoma()){
 					setMelhorSoma(soma);
 					setMelhorGrupo(grupoTemp);
@@ -138,6 +140,8 @@ public class Problema01 {
 				
 				ArrayList<Integer> distancias = atribuiDistancias(grupoTemp);
 				int soma = somaGrupo(distancias);
+				imprimiGrupo(grupoTemp);
+				System.out.println("Soma: " + soma);
 				if(soma < getMelhorSoma()){
 					setMelhorSoma(soma);
 					setMelhorGrupo(grupoTemp);
@@ -156,6 +160,8 @@ public class Problema01 {
 				
 				ArrayList<Integer> distancias = atribuiDistancias(grupoTemp);
 				int soma = somaGrupo(distancias);
+				imprimiGrupo(grupoTemp);
+				System.out.println("Soma: " + soma);
 				if(soma < getMelhorSoma()){
 					setMelhorSoma(soma);
 					setMelhorGrupo(grupoTemp);
@@ -186,7 +192,8 @@ public class Problema01 {
 		}
 		if(adiciona == true){
 			melhorSubGrupo.remove(indice);
-			melhorSubGrupo.add(funcionario);
+			//melhorSubGrupo.add(funcionario);
+			melhorSubGrupo.add(indice, funcionario);
 		}else{
 			//melhorSubGrupo.add(valor);
 			trocaFunc(melhorSubGrupo, funcionarios, indice);
@@ -199,10 +206,8 @@ public class Problema01 {
 		Random r = new Random();
 		boolean troca = false;
 		int funcionario = (int) cargo.get(r.nextInt(cargo.size())); //sorteia um funcionário dentro do arraylist passado por parametro
-		//int cont = 1;
 		
 		resultado.add(funcionario);
-		//System.out.printf(funcionario + "|");
 		for (int k = 0; resultado.size() < maxCargo; k++) {
 			funcionario = (int) cargo.get(r.nextInt(cargo.size()));
 			for (int i = 0; i < resultado.size(); i++) {
@@ -215,30 +220,9 @@ public class Problema01 {
 			}
 			if(troca == true){
 				resultado.add(funcionario);
-				//cont++;
-				//System.out.printf(funcionario + "|");
 			}
 		}
-		//System.out.println("cont: " + cont);
 		return resultado;
-	}
-	
-	
-	public void trocaMedico(){
-		
-	}
-	
-	public String encontraCargo(){
-		for(int i = 0; i < qntFunc; i++){
-			if(this.cargos[i][0] == 1){					
-				return "medico";
-			}else if(this.cargos[i][1] == 1){
-				return "emfermeiro";
-			}else if(this.cargos[i][2] == 1){
-				return "secretario";
-			}
-		}
-		return null;
 	}
 	
 	public ArrayList<Integer> atribuiDistancias(ArrayList<Integer> posicoes){
@@ -279,10 +263,6 @@ public class Problema01 {
 			}
 		}
 		/*
-		if(soma > getMelhorSoma()){
-			setMelhorSoma(soma);
-		}
-		
 		System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
 		System.out.println("RESULTADO: " + soma);
 		System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
@@ -294,13 +274,12 @@ public class Problema01 {
 		for(int i = 0; i < grupo.size(); i++){
 			System.out.printf(grupo.get(i) + "|");
 		}
-		System.out.println("");
+		//System.out.println("");
 	}
 	
 	public void imprimiMelhorGrupo(){
 		ArrayList<Integer> melhor = new ArrayList<Integer>();
 		melhor = getMelhorGrupo();
-		//System.out.printf("Melhor Grupo: ");
 		for(int i = 0; i < melhor.size(); i++){
 			System.out.printf(melhor.get(i)+1 + "|");
 		}
@@ -371,9 +350,7 @@ public class Problema01 {
         	System.out.println("");
         }
 	}
-	public int aleatorio(int inicio, int fim){
-		return (int) Math.ceil(Math.random() * (fim  - inicio + 1)) - 1 + inicio;
-	}
+
 	public void rand(int Str, int End, int tam) {
 		ArrayList<Integer> numeros = new ArrayList<Integer>();
 		boolean add = false;

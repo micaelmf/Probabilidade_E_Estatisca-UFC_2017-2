@@ -36,7 +36,7 @@ public class Principal {
 		*/
 		
 		for(int i = 0; i < 1; i++){
-			p.procuraMelhorGrupo(10);
+			p.procuraMelhorGrupo(1000);
 			p.imprimiMelhorGrupo();
 		}
 	}
