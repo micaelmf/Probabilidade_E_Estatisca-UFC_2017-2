@@ -28,17 +28,8 @@ public class Principal {
 		p.setMaxSecretarios(5);
 		
 		p.primeiroGrupo();
-		
-		/*
-		Random r = new Random();
-		ArrayList<Integer> teste = p.getMelhorCombEnfermeiros();
-		System.out.println(teste.get(r.nextInt(8)));
-		*/
-		
-		for(int i = 0; i < 1; i++){
-			p.procuraMelhorGrupo(1000);
-			p.imprimiMelhorGrupo();
-		}
+		p.procuraMelhorGrupo(10000);
+		p.imprimiMelhorGrupo();
 	}
 
 }

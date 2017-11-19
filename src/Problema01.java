@@ -106,34 +106,38 @@ public class Problema01 {
 		ArrayList<Integer> grupoTemp = new ArrayList<Integer>();
 		ArrayList<Integer> distancias = new ArrayList<Integer>();
 		ArrayList<Integer> subGrupo = new ArrayList<Integer>();
-		//ArrayList<Integer> melhorSubGrupo = new ArrayList<Integer>();
 		int soma = 0;
 		String cargo = null;
 		
 		
 		for (int i = 0; i < tentativas; i++) {
-			int num = r.nextInt(1000);
+			int num = r.nextInt(1000); //sorteia um número de 0 a 1000
 			
+			/*
+			Selecionar o funcionário, para troca, com base no número sorteado,
+			ex.: Se o número sorteado foi 339 deve-se selecionar um secretário para ser trocado. 
+			 */
 			if(num >= 0 && num <= 130 ){
 				//trocar médico
 				Random r2 = new Random();
 				cargo = "medico";
 				ArrayList<Integer> melhorSubGrupo = new ArrayList<Integer>(getMelhorCombMedicos());
-				int indice = r2.nextInt(melhorSubGrupo.size()); // para que no prox. laço não seja removido quem foi adicionado no laço atual
-				subGrupo = trocaFunc(melhorSubGrupo, getMedicos(), indice);
+				int indice = r2.nextInt(melhorSubGrupo.size()); //sorteia um numero entre 0 e o tamanho do melhor subgrupo 
+				subGrupo = trocaFunc(melhorSubGrupo, getMedicos(), indice); //realiza a troca do funcionario selecionado por sorteio
+				//monta o novo grupo
 				grupoTemp.addAll(subGrupo);
 				grupoTemp.addAll(getMelhorCombEnfermeiros());
 				grupoTemp.addAll(getMelhorCombSecretarios());
 				
-				distancias = atribuiDistancias(grupoTemp);
-				soma = somaGrupo(distancias);
+				distancias = atribuiDistancias(grupoTemp); //obtem as distâncias
+				soma = somaGrupo(distancias); //calcula as distâncias
 				
 			}else if(num >= 131 && num <= 670){
 				//troca enfermeiro
 				Random r2 = new Random();
 				cargo = "enfermeiro";
 				ArrayList<Integer> melhorSubGrupo = new ArrayList<Integer>(getMelhorCombEnfermeiros());
-				int indice = r2.nextInt(melhorSubGrupo.size()); // para que no prox. laço não seja removido quem foi adicionado no laço atual
+				int indice = r2.nextInt(melhorSubGrupo.size());
 				subGrupo = trocaFunc(melhorSubGrupo, getEnfermeiros(), indice);
 				grupoTemp.addAll(getMelhorCombMedicos());
 				grupoTemp.addAll(subGrupo);
@@ -147,7 +151,7 @@ public class Problema01 {
 				Random r2 = new Random();
 				cargo = "secretario";
 				ArrayList<Integer> melhorSubGrupo = new ArrayList<Integer>(getMelhorCombSecretarios());
-				int indice = r2.nextInt(melhorSubGrupo.size()); // para que no prox. laço não seja removido quem foi adicionado no laço atual
+				int indice = r2.nextInt(melhorSubGrupo.size()); 
 				subGrupo = trocaFunc(melhorSubGrupo, getSecretarios(), indice);
 				grupoTemp.addAll(getMelhorCombMedicos());
 				grupoTemp.addAll(getMelhorCombEnfermeiros());
@@ -160,6 +164,7 @@ public class Problema01 {
 				System.out.println("COMO ASSIM?!");
 			}
 			
+			//atualiza as informações de melhor soma, grupo e subgrupo e imprimi
 			if(soma < getMelhorSoma()){
 				setMelhorSoma(soma);
 				setMelhorGrupo(grupoTemp);
@@ -175,12 +180,11 @@ public class Problema01 {
 					System.out.println("DEU ERRADO!!!");
 				}
 			}
+			//prepara as variáveis para o próximo laço
 			grupoTemp = new ArrayList<Integer>();
 			subGrupo = new ArrayList<Integer>();
-			//melhorSubGrupo = new ArrayList<Integer>();
 			soma = 0;
 			cargo = null;
-			
 		}
 	}
 	
@@ -188,9 +192,9 @@ public class Problema01 {
 		Random r = new Random();
 		boolean adiciona = false;
 		
-		int valor = melhorSubGrupo.get(indice);
-		//melhorSubGrupo.remove(indice);
-		int funcionario = (int) funcionarios.get(r.nextInt(funcionarios.size()));
+		//int valor = melhorSubGrupo.get(indice);
+		int funcionario = (int) funcionarios.get(r.nextInt(funcionarios.size())); //sorte um funcionário dentre todos o funcionários com o mesmo cargo
+		//verifica se o funcionário sorteado já está a lista
 		for (int i = 0; i < melhorSubGrupo.size(); i++) {
 			if(funcionario != melhorSubGrupo.get(i)){
 				adiciona = true;
@@ -199,12 +203,12 @@ public class Problema01 {
 				break;
 			}
 		}
+		//se o funcionário não estiver na lista acontece a troca
 		if(adiciona == true){
 			melhorSubGrupo.remove(indice);
-			//melhorSubGrupo.add(funcionario);
 			melhorSubGrupo.add(indice, funcionario);
 		}else{
-			//melhorSubGrupo.add(valor);
+			//se o funcionário estiver na lista acontece uma recursão para encontrar um que não esteja 
 			trocaFunc(melhorSubGrupo, funcionarios, indice);
 		}
 		return melhorSubGrupo;
@@ -287,12 +291,14 @@ public class Problema01 {
 	}
 	
 	public void imprimiMelhorGrupo(){
+		System.out.println("-----------------------------");
+		System.out.println("Funcionários do melhor grupo:");
 		ArrayList<Integer> melhor = new ArrayList<Integer>();
 		melhor = getMelhorGrupo();
 		for(int i = 0; i < melhor.size(); i++){
 			System.out.printf(melhor.get(i)+1 + "|");
 		}
-		System.out.printf("Soma:" + getMelhorSoma());
+		System.out.printf("Soma: " + getMelhorSoma());
 		System.out.println("");
 	}
 	
