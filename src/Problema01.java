@@ -83,8 +83,8 @@ public class Problema01 {
 			}
 		}
 		ArrayList<Integer> distancias = atribuiDistancias(posicoes);
-		somaGrupo(distancias);
-		setMelhorGrupo(distancias);
+		setMelhorSoma(somaGrupo(distancias));
+		setMelhorGrupo(posicoes);
 		setMelhorCombMedicos(med);
 		setMelhorCombEnfermeiros(enf);
 		setMelhorCombSecretarios(sec);
@@ -104,6 +104,12 @@ public class Problema01 {
 		
 		Random r = new Random();		
 		ArrayList<Integer> grupoTemp = new ArrayList<Integer>();
+		ArrayList<Integer> distancias = new ArrayList<Integer>();
+		ArrayList<Integer> subGrupo = new ArrayList<Integer>();
+		//ArrayList<Integer> melhorSubGrupo = new ArrayList<Integer>();
+		int soma = 0;
+		String cargo = null;
+		
 		
 		for (int i = 0; i < tentativas; i++) {
 			int num = r.nextInt(1000);
@@ -111,66 +117,69 @@ public class Problema01 {
 			if(num >= 0 && num <= 130 ){
 				//trocar médico
 				Random r2 = new Random();
-				ArrayList<Integer> melhorSubGrupo = getMelhorCombMedicos();
-				int indice = r2.nextInt(melhorSubGrupo.size()-1); // -1 para que no prox. laço não seja removido quem foi adicionado no laço atual
-				ArrayList<Integer> subGrupo = trocaFunc(getMelhorCombMedicos(), getMedicos(), indice);
+				cargo = "medico";
+				ArrayList<Integer> melhorSubGrupo = new ArrayList<Integer>(getMelhorCombMedicos());
+				int indice = r2.nextInt(melhorSubGrupo.size()); // para que no prox. laço não seja removido quem foi adicionado no laço atual
+				subGrupo = trocaFunc(melhorSubGrupo, getMedicos(), indice);
 				grupoTemp.addAll(subGrupo);
 				grupoTemp.addAll(getMelhorCombEnfermeiros());
 				grupoTemp.addAll(getMelhorCombSecretarios());
 				
-				ArrayList<Integer> distancias = atribuiDistancias(grupoTemp);
-				int soma = somaGrupo(distancias);
-				imprimiGrupo(grupoTemp);
-				System.out.println("Soma: " + soma);
-				if(soma < getMelhorSoma()){
-					setMelhorSoma(soma);
-					setMelhorGrupo(grupoTemp);
-					setMelhorCombMedicos(subGrupo);
-				}
-				grupoTemp = new ArrayList<Integer>();
+				distancias = atribuiDistancias(grupoTemp);
+				soma = somaGrupo(distancias);
+				
 			}else if(num >= 131 && num <= 670){
 				//troca enfermeiro
-				Random r2 = new Random();		
-				ArrayList<Integer> melhorSubGrupo = getMelhorCombEnfermeiros();
-				int indice = r2.nextInt(melhorSubGrupo.size()-1); // -1 para que no prox. laço não seja removido quem foi adicionado no laço atual
-				ArrayList<Integer> subGrupo = trocaFunc(getMelhorCombEnfermeiros(), getEnfermeiros(), indice);
+				Random r2 = new Random();
+				cargo = "enfermeiro";
+				ArrayList<Integer> melhorSubGrupo = new ArrayList<Integer>(getMelhorCombEnfermeiros());
+				int indice = r2.nextInt(melhorSubGrupo.size()); // para que no prox. laço não seja removido quem foi adicionado no laço atual
+				subGrupo = trocaFunc(melhorSubGrupo, getEnfermeiros(), indice);
 				grupoTemp.addAll(getMelhorCombMedicos());
 				grupoTemp.addAll(subGrupo);
 				grupoTemp.addAll(getMelhorCombSecretarios());
 				
-				ArrayList<Integer> distancias = atribuiDistancias(grupoTemp);
-				int soma = somaGrupo(distancias);
-				imprimiGrupo(grupoTemp);
-				System.out.println("Soma: " + soma);
-				if(soma < getMelhorSoma()){
-					setMelhorSoma(soma);
-					setMelhorGrupo(grupoTemp);
-					setMelhorCombEnfermeiros(subGrupo);
-				}
-				grupoTemp = new ArrayList<Integer>();
+				distancias = atribuiDistancias(grupoTemp);
+				soma = somaGrupo(distancias);
+				
 			}else if(num >= 671 && num <= 1000 ){
 				//troca secretário
-				Random r2 = new Random();		
-				ArrayList<Integer> melhorSubGrupo = getMelhorCombSecretarios();
-				int indice = r2.nextInt(melhorSubGrupo.size()-1); // -1 para que no prox. laço não seja removido quem foi adicionado no laço atual
-				ArrayList<Integer> subGrupo = trocaFunc(getMelhorCombSecretarios(), getSecretarios(), indice);
+				Random r2 = new Random();
+				cargo = "secretario";
+				ArrayList<Integer> melhorSubGrupo = new ArrayList<Integer>(getMelhorCombSecretarios());
+				int indice = r2.nextInt(melhorSubGrupo.size()); // para que no prox. laço não seja removido quem foi adicionado no laço atual
+				subGrupo = trocaFunc(melhorSubGrupo, getSecretarios(), indice);
 				grupoTemp.addAll(getMelhorCombMedicos());
 				grupoTemp.addAll(getMelhorCombEnfermeiros());
 				grupoTemp.addAll(subGrupo);
 				
-				ArrayList<Integer> distancias = atribuiDistancias(grupoTemp);
-				int soma = somaGrupo(distancias);
-				imprimiGrupo(grupoTemp);
-				System.out.println("Soma: " + soma);
-				if(soma < getMelhorSoma()){
-					setMelhorSoma(soma);
-					setMelhorGrupo(grupoTemp);
-					setMelhorCombSecretarios(subGrupo);
-				}
-				grupoTemp = new ArrayList<Integer>();
+				distancias = atribuiDistancias(grupoTemp);
+				soma = somaGrupo(distancias);
+				
 			}else{
 				System.out.println("COMO ASSIM?!");
 			}
+			
+			if(soma < getMelhorSoma()){
+				setMelhorSoma(soma);
+				setMelhorGrupo(grupoTemp);
+				imprimiGrupo(grupoTemp);
+				System.out.println("Soma: " + soma);
+				if(cargo == "medico"){
+					setMelhorCombMedicos(subGrupo);					
+				}else if (cargo == "enfermeiro"){
+					setMelhorCombEnfermeiros(subGrupo);
+				}else if (cargo == "secretario"){
+					setMelhorCombSecretarios(subGrupo);
+				}else{
+					System.out.println("DEU ERRADO!!!");
+				}
+			}
+			grupoTemp = new ArrayList<Integer>();
+			subGrupo = new ArrayList<Integer>();
+			//melhorSubGrupo = new ArrayList<Integer>();
+			soma = 0;
+			cargo = null;
 			
 		}
 	}
