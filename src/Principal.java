@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Random;
 
 import javax.swing.plaf.synth.SynthSeparatorUI;
 
@@ -27,8 +28,15 @@ public class Principal {
 		p.setMaxSecretarios(5);
 		
 		p.primeiroGrupo();
-		for(int i = 0; i < 10; i++){
-			p.procuraMelhorGrupo(100);
+		
+		/*
+		Random r = new Random();
+		ArrayList<Integer> teste = p.getMelhorCombEnfermeiros();
+		System.out.println(teste.get(r.nextInt(8)));
+		*/
+		
+		for(int i = 0; i < 1; i++){
+			p.procuraMelhorGrupo(10);
 			p.imprimiMelhorGrupo();
 		}
 	}

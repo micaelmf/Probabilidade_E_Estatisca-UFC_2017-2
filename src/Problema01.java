@@ -48,6 +48,9 @@ public class Problema01 {
 		int contE = 0;
 		int contS = 0;
 		ArrayList<Integer> posicoes = new ArrayList<Integer>();
+		ArrayList<Integer> med = new ArrayList<Integer>();
+		ArrayList<Integer> enf = new ArrayList<Integer>();
+		ArrayList<Integer> sec = new ArrayList<Integer>();
 		
 		for(int i = 0; i < qntFunc; i++){
 			if(this.cargos[i][0] == 1){					
@@ -55,7 +58,8 @@ public class Problema01 {
 				this.medicos.add(i); //armazena todos os médicos
 				if(contM < this.maxMedicos){
 					//System.out.printf("méd("+ i +")|");
-					posicoes.add(i); //identifica o índice do funcionário na matriz de cargos
+					posicoes.add(i); //guarda o índice do funcionário obtido matriz de cargos
+					med.add(i);
 				}
 				contM++;
 			}else if(this.cargos[i][1] == 1){
@@ -64,6 +68,7 @@ public class Problema01 {
 				if(contE < this.maxEnfermeiros){
 					//System.out.printf("enf("+ i +")|");
 					posicoes.add(i);
+					enf.add(i);
 				}
 				contE++;
 			}else if(this.cargos[i][2] == 1){
@@ -72,6 +77,7 @@ public class Problema01 {
 				if(contS < this.maxSecretarios){
 					//System.out.printf("sec("+ i +")|");
 					posicoes.add(i);
+					sec.add(i);
 				}
 				contS++;
 			}
@@ -79,102 +85,113 @@ public class Problema01 {
 		ArrayList<Integer> distancias = atribuiDistancias(posicoes);
 		somaGrupo(distancias);
 		setMelhorGrupo(distancias);
+		setMelhorCombMedicos(med);
+		setMelhorCombEnfermeiros(enf);
+		setMelhorCombSecretarios(sec);
 	}
 	
 	public void procuraMelhorGrupo(int tentativas){
 		/*
-		 * METADE 1
-		 * OK 1) Criar um vetor totalmente aleatorio para os três cargos
-		 * OK 2) juntar os três vetores criados acima
-		 * OK 3) somar o vetor resultante da união
-		 * OK 4) se a soma for menor que "melhorsoma" substituir o "melhorgrupo" pelo grupo atual e armazenar
-		 * 			os três vetores dos cargos
-		 * OK 5) repetir os passos acima até "cont" alcançar "metade1"
-		 * 
-		 * METADE 2
-		 *    1) pegar os três vetores de cargo e substituir a metade de cada um deles aleatoriamente
-		 *    2) juntar os três vetores alterados acima
-		 *    3) somar o vetor resultante da união
-		 *    4) repetir os passos acima até "cont" alcançar o numero de "tentativas"
+		 * 1) Pegar o melhor grupo e trocar apenas um funcionário 
+		 * 		1.1 > Sortear um número entre 0 e 1mil
+		 * 			  Relação entre o número sorteado e o cargo: 1-130 = médico; 131-670 = enfermeiro; 671-1000 = secretários
+		 * 		1.2 > Selecionar o funcionário, para troca, com base no número sorteado, ex.: Se o número sorteado foi 339
+		 * 			  deve-se selecionar um secretário para ser trocado.
+		 * 		1.3 > Selecionar um funcionário do mesmo tipo para substituir o funcionário selecionado antes 
+		 * 2) Somar as distâncias do novo vetor
+		 * 3) Guardar a melhor soma e o melhor vetor
 		 */
 		
-		int metade = tentativas/2;
-		int cont = 1;
+		Random r = new Random();		
 		ArrayList<Integer> grupoTemp = new ArrayList<Integer>();
-		//System.out.println("---------------------------------------------INÍCIO");
-		while(cont <= metade){
-			ArrayList<Integer> med = new ArrayList<Integer>();
-			ArrayList<Integer> enf = new ArrayList<Integer>();
-			ArrayList<Integer> sec = new ArrayList<Integer>();
-			med = vetorAleatorioFuncionarios(getMaxMedicos(), getMedicos()); //armazena a combinação de médicos
-			enf = vetorAleatorioFuncionarios(getMaxEnfermeiros(), getEnfermeiros());
-			sec = vetorAleatorioFuncionarios(getMaxSecretarios(), getSecretarios());
-			//junta os vetores acima
-			grupoTemp.addAll(med);
-			grupoTemp.addAll(enf);
-			grupoTemp.addAll(sec);
+		
+		for (int i = 0; i < tentativas; i++) {
+			int num = r.nextInt(1000);
 			
-			//imprimiGrupo(grupoTemp);
-			ArrayList<Integer> distancias = atribuiDistancias(grupoTemp);
-			int soma = somaGrupo(distancias); 
-			if(soma < getMelhorSoma()){
-				setMelhorSoma(soma);
-				setMelhorGrupo(grupoTemp);
-				setMelhorCombMedicos(med);
-				setMelhorCombEnfermeiros(enf);
-				setMelhorCombSecretarios(sec);
+			if(num >= 1 && num <= 130 ){
+				//trocar médico
+				Random r2 = new Random();
+				ArrayList<Integer> melhorSubGrupo = getMelhorCombMedicos();
+				int indice = r2.nextInt(melhorSubGrupo.size()-1); // -1 para que no prox. laço não seja removido quem foi adicionado no laço atual
+				ArrayList<Integer> subGrupo = trocaFunc(getMelhorCombMedicos(), getMedicos(), indice);
+				grupoTemp.addAll(subGrupo);
+				grupoTemp.addAll(getMelhorCombEnfermeiros());
+				grupoTemp.addAll(getMelhorCombSecretarios());
+				
+				ArrayList<Integer> distancias = atribuiDistancias(grupoTemp);
+				int soma = somaGrupo(distancias);
+				if(soma < getMelhorSoma()){
+					setMelhorSoma(soma);
+					setMelhorGrupo(grupoTemp);
+					setMelhorCombMedicos(subGrupo);
+				}
+				grupoTemp = new ArrayList<Integer>();
+			}else if(num >= 131 && num <= 670){
+				//troca enfermeiro
+				Random r2 = new Random();		
+				ArrayList<Integer> melhorSubGrupo = getMelhorCombEnfermeiros();
+				int indice = r2.nextInt(melhorSubGrupo.size()-1); // -1 para que no prox. laço não seja removido quem foi adicionado no laço atual
+				ArrayList<Integer> subGrupo = trocaFunc(getMelhorCombEnfermeiros(), getEnfermeiros(), indice);
+				grupoTemp.addAll(getMelhorCombMedicos());
+				grupoTemp.addAll(subGrupo);
+				grupoTemp.addAll(getMelhorCombSecretarios());
+				
+				ArrayList<Integer> distancias = atribuiDistancias(grupoTemp);
+				int soma = somaGrupo(distancias);
+				if(soma < getMelhorSoma()){
+					setMelhorSoma(soma);
+					setMelhorGrupo(grupoTemp);
+					setMelhorCombEnfermeiros(subGrupo);
+				}
+				grupoTemp = new ArrayList<Integer>();
+			}else if(num >= 671 && num <= 1000 ){
+				//troca secretário
+				Random r2 = new Random();		
+				ArrayList<Integer> melhorSubGrupo = getMelhorCombSecretarios();
+				int indice = r2.nextInt(melhorSubGrupo.size()-1); // -1 para que no prox. laço não seja removido quem foi adicionado no laço atual
+				ArrayList<Integer> subGrupo = trocaFunc(getMelhorCombSecretarios(), getSecretarios(), indice);
+				grupoTemp.addAll(getMelhorCombMedicos());
+				grupoTemp.addAll(getMelhorCombEnfermeiros());
+				grupoTemp.addAll(subGrupo);
+				
+				ArrayList<Integer> distancias = atribuiDistancias(grupoTemp);
+				int soma = somaGrupo(distancias);
+				if(soma < getMelhorSoma()){
+					setMelhorSoma(soma);
+					setMelhorGrupo(grupoTemp);
+					setMelhorCombSecretarios(subGrupo);
+				}
+				grupoTemp = new ArrayList<Integer>();
+			}else{
+				System.out.println("COMO ASSIM?!");
 			}
-			cont++;
-			//imprimiGrupo(grupoTemp);
-			grupoTemp = new ArrayList<Integer>();
+			
 		}
-		
-		while(cont <= tentativas){
-			grupoTemp.addAll(getMelhorCombMedicos());
-			grupoTemp.addAll(trocaMetadeFunc(getMelhorCombEnfermeiros(),getEnfermeiros()));
-			grupoTemp.addAll(getMelhorCombSecretarios());
-
-			ArrayList<Integer> distancias = atribuiDistancias(grupoTemp);
-			int soma = somaGrupo(distancias);
-			if(soma < getMelhorSoma()){
-				setMelhorSoma(soma);
-				//setMelhorGrupo(grupoTemp);
-			}
-			cont++;
-			grupoTemp = new ArrayList<Integer>();
-		}
-		
-		//System.out.println("---------------------------------------------FIM");
 	}
 	
-	public ArrayList<Integer> trocaMetadeFunc(ArrayList<Integer> resultado, ArrayList<Integer> funcionarios){
-		//ArrayList<Integer> resultado = new ArrayList<Integer>(); //armazenas os funcionários para retorno
+	public ArrayList<Integer> trocaFunc(ArrayList<Integer> melhorSubGrupo, ArrayList<Integer> funcionarios, int indice){
 		Random r = new Random();
 		boolean adiciona = false;
-
-		int qntTrocas = resultado.size()/2;
-		//removendo a metade do vetor
-		for(int i = 0; i < qntTrocas; i++){
-			resultado.remove(resultado.size()-1);
-		}
-		int cont = 0;
-		while (cont < qntTrocas) {
-			int funcionario = (int) funcionarios.get(r.nextInt(funcionarios.size()));
-			for (int i = 0; i < resultado.size(); i++) {
-				
-				if(funcionario != resultado.get(i)){
-					adiciona = true;
-				}else{
-					adiciona = false;
-					break;
-				}
-			}
-			if(adiciona == true){
-				resultado.add(funcionario);
-				cont++;
+		
+		int valor = melhorSubGrupo.get(indice);
+		//melhorSubGrupo.remove(indice);
+		int funcionario = (int) funcionarios.get(r.nextInt(funcionarios.size()));
+		for (int i = 0; i < melhorSubGrupo.size(); i++) {
+			if(funcionario != melhorSubGrupo.get(i)){
+				adiciona = true;
+			}else{
+				adiciona = false;
+				break;
 			}
 		}
-		return resultado;
+		if(adiciona == true){
+			melhorSubGrupo.remove(indice);
+			melhorSubGrupo.add(funcionario);
+		}else{
+			//melhorSubGrupo.add(valor);
+			trocaFunc(melhorSubGrupo, funcionarios, indice);
+		}
+		return melhorSubGrupo;
 	}
 	
 	public ArrayList<Integer> vetorAleatorioFuncionarios(int maxCargo, ArrayList<Integer> cargo){
@@ -287,8 +304,8 @@ public class Problema01 {
 		for(int i = 0; i < melhor.size(); i++){
 			System.out.printf(melhor.get(i)+1 + "|");
 		}
+		System.out.printf("Soma:" + getMelhorSoma());
 		System.out.println("");
-		//System.out.println("Soma:" + getMelhorSoma());
 	}
 	
 	public void carregaDistancias() throws IOException{
